@@ -10,9 +10,9 @@ A simple, Cooptimize-branded pomodoro timer that works on phones and desktops.
 
    ```
    @Joel I need help.
-   Goal: Test stuff
-   Why: I want to see if this works, I don't want it to be broken
-   What I tried: Click the button, Watch it spin, wait
+   Goal: Fix Broken Power BI Report
+   Why: It is broken, users do not like when reports are broken or numbers are wrong.
+   What I tried: Open report in powerbi.com app, Investigate DAX measures, Look at stored procedures populating reported facts.
    ```
 
 It is plain HTML, CSS and JavaScript: no build step and no dependencies.

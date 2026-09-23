@@ -240,7 +240,7 @@
 
     fields.attempt.placeholder = reviewing
       ? 'What you did, what worked, where you got stuck'
-      : locked ? 'Jot notes as you work' : 'Rebuild the date table and fix the YoY measure';
+      : locked ? 'Jot notes as you work' : 'Open report in powerbi.com app, Investigate DAX measures, Look at stored procedures populating reported facts.';
     themeColor.content = locked ? '#0B141B' : '#00406B';
 
     if (phase === 'ringing') document.title = "Time's up · Focus";

@@ -73,10 +73,12 @@ button { cursor: pointer; }
   gap: 10px;
 }
 
-/* On short phone screens, drop the subtitle so the start buttons stay above the fold. */
+/* On short phone screens, tighten up so the start buttons stay above the fold. */
 @media (max-height: 700px) {
   :root { --dial-small: clamp(72px, 11vh, 150px); }
   .masthead .lede { display: none; }
+  /* Keep long example text to one line so empty boxes don't push the start buttons down. */
+  textarea::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
 /* ---------- Logo dial ---------- */
