@@ -18,7 +18,7 @@
   const progressPath = $('progress');
   const progressLength = progressPath.getTotalLength();
   const scale = $('scale');
-  const scaleLabels = [];
+  const pointer = $('pointer');
   const statusEl = $('status');
   const toastEl = $('toast');
   const announcer = $('announcer');
@@ -103,18 +103,21 @@
 
   // ---------- Dial rendering ----------
 
-  let shown = { angles: [0, 0, 0], progress: 1, dial: 0 };
+  // The navy arc runs clockwise from its lower-left end (158deg) to its top-right end (315deg).
+  const ARC_START = 158;
+  const ARC_SWEEP = 157;
+
+  let shown = { angles: [0, 0, 0], fill: 1 };
   let blend = null;
   let raf = 0;
 
   function targetVisual() {
-    if (state.phase !== 'focusing') return { angles: [0, 0, 0], progress: 1, dial: 0 };
+    if (state.phase !== 'focusing') return { angles: [0, 0, 0], fill: 1 };
     const remaining = remainingSeconds();
     const total = state.minutes * 60;
     return {
       angles: hands.map((h) => (reduceMotion.matches ? 0 : (-h.dir * 360 * remaining / h.period) % 360)),
-      progress: total ? 1 - remaining / total : 1,
-      dial: remaining / 60 * 6, // egg-timer scale: 6 degrees per minute
+      fill: total ? remaining / total : 1, // share of the navy arc still showing
     };
   }
 
@@ -122,7 +125,7 @@
   function beginBlend() {
     blend = reduceMotion.matches
       ? null
-      : { from: { angles: shown.angles.slice(), progress: shown.progress, dial: shown.dial }, t0: performance.now() };
+      : { from: { angles: shown.angles.slice(), fill: shown.fill }, t0: performance.now() };
   }
 
   function easeInOut(k) {
@@ -143,37 +146,44 @@
             const delta = (((a - from.angles[i]) % 360) + 540) % 360 - 180; // shortest way round
             return from.angles[i] + delta * e;
           }),
-          progress: from.progress + (v.progress - from.progress) * e,
-          // The long way round on purpose: starting a session winds the scale up like an egg timer.
-          dial: from.dial + (v.dial - from.dial) * e,
+          fill: from.fill + (v.fill - from.fill) * e,
         };
       }
     }
     hands.forEach((h, i) => h.el.setAttribute('transform', `rotate(${v.angles[i].toFixed(2)})`));
-    renderScale(v.dial);
-    progressPath.style.strokeDasharray = v.progress >= 0.9999
+    // The navy arc shrinks toward its top-right end (the 0 mark) as time runs out:
+    // an empty dash, a gap for the time used, then the time left.
+    const used = progressLength * (1 - v.fill);
+    // The red pointer sits on the arc's shrinking end, which is the time left on the scale.
+    pointer.setAttribute('transform', `rotate(${(ARC_START + ARC_SWEEP * (1 - v.fill)).toFixed(2)})`);
+    progressPath.style.strokeDasharray = v.fill >= 0.9999
       ? 'none'
-      : `${(progressLength * v.progress).toFixed(1)} ${progressLength.toFixed(1)}`;
+      : `0 ${used.toFixed(1)} ${(progressLength - used).toFixed(1)} ${progressLength.toFixed(1)}`;
     shown = v;
   }
 
-  // ---------- Egg-timer scale ----------
+  // ---------- Countdown scale along the navy C ----------
 
   const SVG_NS = 'http://www.w3.org/2000/svg';
-  const LABEL_RADIUS = 760;
+  let scaleMinutes = 0;
 
-  // Minute m sits m * 6 degrees counter-clockwise of the pointer at 12 o'clock, so turning
-  // the scale clockwise by (minutes left * 6) puts the time left under the pointer.
   function polar(r, deg) {
     const rad = deg * Math.PI / 180;
-    return [r * Math.sin(rad), -r * Math.cos(rad)];
+    return [r * Math.cos(rad), r * Math.sin(rad)];
   }
 
-  function buildScale() {
-    for (let m = 0; m < 60; m++) {
+  // 0 sits at the top-right end of the navy C and the session length at the lower-left end,
+  // with a numbered tick every 5 minutes and a small tick for each minute between.
+  function buildScale(minutes) {
+    if (minutes === scaleMinutes || !minutes) return;
+    scaleMinutes = minutes;
+    scale.replaceChildren();
+    $('scale-labels').replaceChildren();
+    for (let m = 0; m <= minutes; m++) {
       const major = m % 5 === 0;
-      const [x1, y1] = polar(662, -m * 6);
-      const [x2, y2] = polar(major ? 712 : 690, -m * 6);
+      const deg = ARC_START + ARC_SWEEP * (1 - m / minutes);
+      const [x1, y1] = polar(662, deg);
+      const [x2, y2] = polar(major ? 712 : 690, deg);
       const tick = document.createElementNS(SVG_NS, 'line');
       tick.setAttribute('class', major ? 'tick tick-major' : 'tick tick-minor');
       tick.setAttribute('x1', x1.toFixed(1));
@@ -182,23 +192,15 @@
       tick.setAttribute('y2', y2.toFixed(1));
       scale.appendChild(tick);
       if (major) {
+        const [x, y] = polar(765, deg);
         const label = document.createElementNS(SVG_NS, 'text');
         label.setAttribute('class', 'scale-label');
+        label.setAttribute('x', x.toFixed(1));
+        label.setAttribute('y', y.toFixed(1));
         label.setAttribute('dy', '0.35em');
         label.textContent = m;
         $('scale-labels').appendChild(label);
-        scaleLabels.push({ el: label, minute: m });
       }
-    }
-  }
-
-  // Ticks rotate as a group; numbers move around the ring but stay upright.
-  function renderScale(dial) {
-    scale.setAttribute('transform', `rotate(${dial.toFixed(2)})`);
-    for (const { el, minute } of scaleLabels) {
-      const [x, y] = polar(LABEL_RADIUS, dial - minute * 6);
-      el.setAttribute('x', x.toFixed(1));
-      el.setAttribute('y', y.toFixed(1));
     }
   }
 
@@ -223,6 +225,7 @@
     document.body.className = `state-${phase}`;
 
     const locked = phase === 'focusing' || phase === 'ringing';
+    if (locked) buildScale(state.minutes);
     for (const el of Object.values(fields)) {
       // "What I will try:" stays editable during a session so it can take notes.
       const frozen = locked && el !== fields.attempt;

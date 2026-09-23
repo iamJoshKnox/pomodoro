@@ -16,7 +16,7 @@
   --line: #D6DDD2;
 
   --dial-small: clamp(120px, 34vw, 168px);
-  /* Logo size while focusing; the egg-timer scale reaches ~37% further out. */
+  /* Logo size while focusing; the countdown scale reaches ~37% further out. */
   --dial-large: min(62vw, 38vh, 320px);
   --ease: cubic-bezier(.2, .8, .2, 1);
 
@@ -111,14 +111,14 @@ button { cursor: pointer; }
 .tick-major { stroke-width: 12; }
 .tick-minor { stroke-width: 5; opacity: .4; }
 
+.pointer { fill: var(--red); }
+
 .scale-label {
   fill: var(--navy);
   font-size: 68px;
   font-weight: 650;
   text-anchor: middle;
 }
-
-.pointer { fill: var(--red); }
 
 /* ---------- Intro ---------- */
 
@@ -364,15 +364,15 @@ textarea:focus {
 .state-focusing .dial-wrap,
 .state-ringing .dial-wrap {
   width: var(--dial-large);
-  margin: calc(var(--dial-large) * .2) auto;
+  /* The scale only rings the top and left of the logo, so it needs room above but little below. */
+  margin: calc(var(--dial-large) * .2) auto calc(var(--dial-large) * .04);
 }
 
 .state-focusing .scale,
 .state-focusing .scale-labels,
 .state-focusing .pointer,
 .state-ringing .scale,
-.state-ringing .scale-labels,
-.state-ringing .pointer { opacity: 1; }
+.state-ringing .scale-labels { opacity: 1; }
 
 /* The red dot breathes: in for 4 seconds, out for 4. */
 .state-focusing .dot { animation: breathe 8s ease-in-out infinite; }
