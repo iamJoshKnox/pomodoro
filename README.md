@@ -18,7 +18,7 @@ A simple, Cooptimize-branded pomodoro timer that works on phones and desktops.
 
    Pasted text can't become a real Teams tag, so the @name goes last: after pasting, delete its last letter and Teams suggests the person, which tags them properly.
 
-   **Edit people** (under the Ask buttons) sets who you can ask. Use each name as it appears in Teams; the button shows the first name. The list is saved in your browser.
+   **(edit names)**, at the end of the hint under the Ask buttons, sets who you can ask. Use each name as it appears in Teams; the button shows the first name. The list is saved in your browser.
 
 It is plain HTML, CSS and JavaScript: no build step and no dependencies.
 

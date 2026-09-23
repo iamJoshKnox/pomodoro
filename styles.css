@@ -341,12 +341,18 @@ textarea:focus {
   text-align: center;
 }
 
-.ask-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 12px;
+/* A quiet inline link at the end of the hint. */
+.edit-names {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: inherit;
+  white-space: nowrap;
+  text-underline-offset: 3px;
 }
+
+.edit-names:focus-visible { text-decoration: underline; }
 
 /* ---------- People dialog ---------- */
 
@@ -670,6 +676,7 @@ textarea:focus {
   .duration:hover { filter: brightness(1.05); transform: translateY(-1px); }
   .ask-button:hover { background: #00507F; transform: translateY(-1px); }
   .remove-person:hover { background: #E2E7DC; color: var(--ink); }
+  .edit-names:hover { color: var(--ink); text-decoration: underline; }
   .think:hover { text-decoration: underline; text-underline-offset: 3px; }
   .text-button:hover { color: var(--ink); text-decoration-color: currentColor; }
 }
