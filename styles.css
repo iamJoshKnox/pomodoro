@@ -14,7 +14,8 @@
   --line: #D6DDD2;
 
   --dial-small: clamp(120px, 34vw, 168px);
-  --dial-large: min(78vw, 50vh, 440px);
+  /* Logo size while focusing; the egg-timer scale reaches ~37% further out. */
+  --dial-large: min(62vw, 38vh, 320px);
   --ease: cubic-bezier(.2, .8, .2, 1);
 
   color-scheme: light;
@@ -64,7 +65,7 @@ button { cursor: pointer; }
 .dial-wrap {
   width: var(--dial-small);
   margin: 0 auto;
-  transition: width .7s var(--ease);
+  transition: width .7s var(--ease), margin .7s var(--ease);
 }
 
 .dial {
@@ -88,17 +89,32 @@ button { cursor: pointer; }
   transition: transform .7s cubic-bezier(.3, 1.35, .5, 1);
 }
 
-.time {
-  fill: #fff;
-  font-size: 118px;
-  font-weight: 650;
-  letter-spacing: -2px;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
+.halo {
+  fill: var(--red);
   opacity: 0;
-  transition: opacity .3s ease;
-  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
 }
+
+.scale,
+.scale-labels,
+.pointer {
+  opacity: 0;
+  transition: opacity .6s var(--ease);
+}
+
+.tick { stroke: var(--navy); }
+.tick-major { stroke-width: 12; }
+.tick-minor { stroke-width: 5; opacity: .4; }
+
+.scale-label {
+  fill: var(--navy);
+  font-size: 68px;
+  font-weight: 650;
+  text-anchor: middle;
+}
+
+.pointer { fill: var(--red); }
 
 /* ---------- Intro ---------- */
 
@@ -306,10 +322,31 @@ textarea:focus {
 .state-ringing .app { justify-content: center; }
 
 .state-focusing .dial-wrap,
-.state-ringing .dial-wrap { width: var(--dial-large); }
+.state-ringing .dial-wrap {
+  width: var(--dial-large);
+  margin: calc(var(--dial-large) * .2) auto;
+}
 
-.state-focusing .dot { transform: scale(1.8); }
-.state-focusing .time { opacity: 1; transition-delay: .25s; }
+.state-focusing .scale,
+.state-focusing .scale-labels,
+.state-focusing .pointer,
+.state-ringing .scale,
+.state-ringing .scale-labels,
+.state-ringing .pointer { opacity: 1; }
+
+/* The red dot breathes: in for 4 seconds, out for 4. */
+.state-focusing .dot { animation: breathe 8s ease-in-out infinite; }
+.state-focusing .halo { animation: halo 8s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+}
+
+@keyframes halo {
+  0%, 100% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(2.05); opacity: .2; }
+}
 
 .state-focusing .intro,
 .state-ringing .intro,
@@ -450,7 +487,9 @@ textarea:focus {
   *,
   *::before,
   *::after { transition-duration: .01ms !important; }
-  .field-goal.nudge textarea { animation: none; }
+  .field-goal.nudge textarea,
+  .state-focusing .dot,
+  .state-focusing .halo { animation: none; }
   .state-ringing .dial-wrap { animation: pulse 1.3s ease-in-out 2; }
 }
 

@@ -18,8 +18,11 @@
         <g id="hand-forest"><path class="ring ring-forest" d="M0 507A507 507 0 1 1 358.5 -358.5"/></g>
         <g id="hand-olive"><path class="ring ring-olive" d="M292.74 292.74A414 414 0 1 1 292.74 -292.74"/></g>
         <g id="hand-lime"><path class="ring ring-lime" d="M216.02 216.02A305.5 305.5 0 1 1 216.02 -216.02"/></g>
+        <g class="scale" id="scale" aria-hidden="true"></g>
+        <g class="scale-labels" id="scale-labels" aria-hidden="true"></g>
+        <path class="pointer" d="M0 -812L-30 -868H30Z"/>
+        <circle class="halo" r="113"/>
         <circle class="dot" r="113"/>
-        <text class="time" id="time" x="0" y="0" dy="0.36em" text-anchor="middle">00:00</text>
       </svg>
     </div>
 
@@ -33,15 +36,15 @@
 
     <form class="card fields" id="fields" autocomplete="off" onsubmit="return false">
       <div class="field field-goal" id="field-goal">
-        <label for="goal">What is the big goal?</label>
+        <label for="goal">What's the big goal?</label>
         <textarea id="goal" rows="1" placeholder="Ship the Q3 sales dashboard"></textarea>
       </div>
       <div class="field field-why">
-        <label for="why">Why am I trying to do it?</label>
+        <label for="why">Why?</label>
         <textarea id="why" rows="1" placeholder="Leadership needs it for Monday's review"></textarea>
       </div>
       <div class="field field-try">
-        <label for="attempt" id="attempt-label">What will I try?</label>
+        <label for="attempt" id="attempt-label">What I will try:</label>
         <textarea id="attempt" rows="1" placeholder="Rebuild the date table and fix the YoY measure"></textarea>
       </div>
     </form>

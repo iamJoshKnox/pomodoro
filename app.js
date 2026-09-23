@@ -5,7 +5,7 @@
   // ?fast runs sessions 60x faster (a "15 minute" session takes 15 seconds) for testing.
   const SPEED = new URLSearchParams(location.search).has('fast') ? 60 : 1;
   const RING_MS = 2700;
-  const BLEND_MS = 700;
+  const BLEND_MS = 900;
   const TITLE = 'Focus · Cooptimize';
 
   const $ = (id) => document.getElementById(id);
@@ -13,7 +13,8 @@
   const attemptLabel = $('attempt-label');
   const progressPath = $('progress');
   const progressLength = progressPath.getTotalLength();
-  const timeText = $('time');
+  const scale = $('scale');
+  const scaleLabels = [];
   const statusEl = $('status');
   const toastEl = $('toast');
   const announcer = $('announcer');
@@ -69,7 +70,6 @@
     const label = formatTime(remainingSeconds());
     if (label === lastLabel) return;
     lastLabel = label;
-    timeText.textContent = label;
     document.title = `${label} · Focus`;
   }
 
@@ -99,17 +99,18 @@
 
   // ---------- Dial rendering ----------
 
-  let shown = { angles: [0, 0, 0], progress: 1 };
+  let shown = { angles: [0, 0, 0], progress: 1, dial: 0 };
   let blend = null;
   let raf = 0;
 
   function targetVisual() {
-    if (state.phase !== 'focusing') return { angles: [0, 0, 0], progress: 1 };
+    if (state.phase !== 'focusing') return { angles: [0, 0, 0], progress: 1, dial: 0 };
     const remaining = remainingSeconds();
     const total = state.minutes * 60;
     return {
       angles: hands.map((h) => (reduceMotion.matches ? 0 : (-h.dir * 360 * remaining / h.period) % 360)),
       progress: total ? 1 - remaining / total : 1,
+      dial: remaining / 60 * 6, // egg-timer scale: 6 degrees per minute
     };
   }
 
@@ -117,7 +118,7 @@
   function beginBlend() {
     blend = reduceMotion.matches
       ? null
-      : { from: { angles: shown.angles.slice(), progress: shown.progress }, t0: performance.now() };
+      : { from: { angles: shown.angles.slice(), progress: shown.progress, dial: shown.dial }, t0: performance.now() };
   }
 
   function easeInOut(k) {
@@ -139,14 +140,62 @@
             return from.angles[i] + delta * e;
           }),
           progress: from.progress + (v.progress - from.progress) * e,
+          // The long way round on purpose: starting a session winds the scale up like an egg timer.
+          dial: from.dial + (v.dial - from.dial) * e,
         };
       }
     }
     hands.forEach((h, i) => h.el.setAttribute('transform', `rotate(${v.angles[i].toFixed(2)})`));
+    renderScale(v.dial);
     progressPath.style.strokeDasharray = v.progress >= 0.9999
       ? 'none'
       : `${(progressLength * v.progress).toFixed(1)} ${progressLength.toFixed(1)}`;
     shown = v;
+  }
+
+  // ---------- Egg-timer scale ----------
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const LABEL_RADIUS = 760;
+
+  // Minute m sits m * 6 degrees counter-clockwise of the pointer at 12 o'clock, so turning
+  // the scale clockwise by (minutes left * 6) puts the time left under the pointer.
+  function polar(r, deg) {
+    const rad = deg * Math.PI / 180;
+    return [r * Math.sin(rad), -r * Math.cos(rad)];
+  }
+
+  function buildScale() {
+    for (let m = 0; m < 60; m++) {
+      const major = m % 5 === 0;
+      const [x1, y1] = polar(662, -m * 6);
+      const [x2, y2] = polar(major ? 712 : 690, -m * 6);
+      const tick = document.createElementNS(SVG_NS, 'line');
+      tick.setAttribute('class', major ? 'tick tick-major' : 'tick tick-minor');
+      tick.setAttribute('x1', x1.toFixed(1));
+      tick.setAttribute('y1', y1.toFixed(1));
+      tick.setAttribute('x2', x2.toFixed(1));
+      tick.setAttribute('y2', y2.toFixed(1));
+      scale.appendChild(tick);
+      if (major) {
+        const label = document.createElementNS(SVG_NS, 'text');
+        label.setAttribute('class', 'scale-label');
+        label.setAttribute('dy', '0.35em');
+        label.textContent = m;
+        $('scale-labels').appendChild(label);
+        scaleLabels.push({ el: label, minute: m });
+      }
+    }
+  }
+
+  // Ticks rotate as a group; numbers move around the ring but stay upright.
+  function renderScale(dial) {
+    scale.setAttribute('transform', `rotate(${dial.toFixed(2)})`);
+    for (const { el, minute } of scaleLabels) {
+      const [x, y] = polar(LABEL_RADIUS, dial - minute * 6);
+      el.setAttribute('x', x.toFixed(1));
+      el.setAttribute('y', y.toFixed(1));
+    }
   }
 
   function frame() {
@@ -177,7 +226,7 @@
     }
 
     const reviewing = phase === 'review';
-    attemptLabel.textContent = reviewing ? 'What did I try?' : 'What will I try?';
+    attemptLabel.textContent = reviewing ? 'What I tried:' : 'What I will try:';
     fields.attempt.placeholder = reviewing
       ? 'What you did, what worked, where you got stuck'
       : 'Rebuild the date table and fix the YoY measure';
@@ -400,6 +449,8 @@
   }
 
   // ---------- Wire up ----------
+
+  buildScale();
 
   for (const [key, el] of Object.entries(fields)) {
     el.value = typeof state[key] === 'string' ? state[key] : '';
