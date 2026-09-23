@@ -9,7 +9,9 @@
   --ink: #0E2A3F;
   --muted: #5C6B75;
   --bg: #F6F8F3;
-  --bg-dim: #DDE2DC;
+  --night: #0B141B;
+  --night-text: #E6EEF2;
+  --night-muted: #8497A3;
   --card: #FFFFFF;
   --line: #D6DDD2;
 
@@ -24,6 +26,8 @@
 *,
 *::before,
 *::after { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
 
 html { -webkit-text-size-adjust: 100%; }
 
@@ -268,6 +272,24 @@ textarea:focus {
   opacity: .8;
 }
 
+.think {
+  justify-self: start;
+  min-height: 36px;
+  margin-top: 2px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .15);
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.think:active { transform: translateY(1px); box-shadow: none; }
+
 .ask { display: none; flex-direction: column; gap: 10px; }
 
 .ask-buttons {
@@ -313,10 +335,27 @@ textarea:focus {
 
 .end-early { display: none; }
 
-/* ---------- Focusing & ringing: the page goes quiet ---------- */
+/* ---------- Focusing & ringing: night mode ---------- */
 
 .state-focusing,
-.state-ringing { background: var(--bg-dim); }
+.state-ringing {
+  background: var(--night);
+  color: var(--night-text);
+  color-scheme: dark;
+}
+
+.state-focusing :focus-visible,
+.state-ringing :focus-visible { outline-color: var(--night-text); }
+
+/* Brand navy nearly vanishes on the night background, so the dial uses a lifted navy. */
+.state-focusing .dial,
+.state-ringing .dial { --navy: #3C7DB3; }
+
+.state-focusing .ring-navy-track,
+.state-ringing .ring-navy-track { opacity: .22; }
+
+.state-focusing .scale-label,
+.state-ringing .scale-label { fill: #A8C2D6; }
 
 .state-focusing .app,
 .state-ringing .app { justify-content: center; }
@@ -355,6 +394,9 @@ textarea:focus {
 
 .state-focusing .end-early { display: block; }
 
+.state-focusing .think,
+.state-ringing .think { display: none; }
+
 .state-focusing .card,
 .state-ringing .card {
   background: transparent;
@@ -368,7 +410,7 @@ textarea:focus {
 .state-focusing label,
 .state-ringing label {
   justify-content: center;
-  color: var(--muted);
+  color: var(--night-muted);
   font-size: .75rem;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -384,7 +426,7 @@ textarea:focus {
   border-color: transparent;
   background: transparent;
   box-shadow: none;
-  color: var(--navy);
+  color: var(--night-text);
   text-align: center;
   cursor: default;
 }
@@ -399,15 +441,36 @@ textarea:focus {
 .state-focusing .field-why textarea,
 .state-ringing .field-why textarea { font-size: 1.1rem; }
 
+/* "What I will try:" stays open as a notepad during the session. */
 .state-focusing .field-try,
-.state-ringing .field-try { opacity: .35; filter: grayscale(1); }
+.state-ringing .field-try { margin-top: 10px; text-align: left; }
 
 .state-focusing .field-try textarea,
-.state-ringing .field-try textarea { font-size: .9rem; color: var(--ink); }
+.state-ringing .field-try textarea {
+  min-height: 96px;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(230, 238, 242, .16);
+  border-radius: 12px;
+  background: rgba(230, 238, 242, .06);
+  font-size: 1rem;
+  text-align: left;
+  cursor: text;
+}
+
+.state-focusing .field-try textarea:focus,
+.state-ringing .field-try textarea:focus {
+  border-color: var(--lime);
+  box-shadow: 0 0 0 4px rgba(179, 210, 53, .18);
+}
+
+.state-focusing .field-try textarea::placeholder,
+.state-ringing .field-try textarea::placeholder { color: #5F727E; }
+
+.state-focusing .end-early { color: var(--night-muted); }
 
 /* Hide empty read-only fields so the quiet view has no blank headings. */
-.state-focusing .field.is-empty,
-.state-ringing .field.is-empty { display: none; }
+.state-focusing .field.is-empty:not(.field-try),
+.state-ringing .field.is-empty:not(.field-try) { display: none; }
 
 /* ---------- Alarm ---------- */
 
@@ -475,6 +538,7 @@ textarea:focus {
 @media (hover: hover) {
   .duration:hover { filter: brightness(1.05); transform: translateY(-1px); }
   .ask-button:hover { background: #00507F; transform: translateY(-1px); }
+  .think:hover { filter: brightness(1.08); transform: translateY(-1px); }
   .text-button:hover { color: var(--ink); text-decoration-color: currentColor; }
 }
 

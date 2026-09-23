@@ -3,15 +3,16 @@
 A simple, Cooptimize-branded pomodoro timer that works on phones and desktops.
 
 1. Answer three questions: **What's the big goal?**, **Why?** and **What I will try:**
-2. Pick **15**, **30** or **45** minutes. The page goes quiet and shows only your goal and your why. An egg-timer scale with 5-minute marks winds up around the logo and slowly unwinds toward the red pointer. The Cooptimize Cs turn like clock hands, the navy arc fills in, and the red dot breathes (in for 4 seconds, out for 4).
+   Press the red **Think Hard** button under Why to add another Why box, then **Think Harder** and **UltraThink** to dig deeper still (up to four whys).
+2. Pick **15**, **30** or **45** minutes. The page switches to a dark night-mode focus screen showing your goal and your whys. **What I will try:** stays open, so you can jot notes as you work. An egg-timer scale with 5-minute marks winds up around the logo and slowly unwinds toward the red pointer. The Cooptimize Cs turn like clock hands, the navy arc fills in, and the red dot breathes (in for 4 seconds, out for 4).
 3. At 00:00 the Cs line up into the logo, which shakes like an alarm clock with a soft ding.
-4. Tidy up **What I tried:**, then press **Ask Joel** or **Ask Eric**. That copies a message ready to paste into Teams:
+4. Tidy up **What I tried:**, then press **Ask Joel** or **Ask Eric**. That copies a message ready to paste into Teams, with all the whys and all the notes each joined into one line:
 
    ```
-   @Joel
-   Big goal: …
-   Why: …
-   What I tried: …
+   @Joel I need help.
+   Goal: Test stuff
+   Why: I want to see if this works, I don't want it to be broken
+   What I tried: Click the button, Watch it spin, wait
    ```
 
 It is plain HTML, CSS and JavaScript: no build step and no dependencies.

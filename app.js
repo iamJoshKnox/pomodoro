@@ -9,8 +9,12 @@
   const TITLE = 'Focus · Cooptimize';
 
   const $ = (id) => document.getElementById(id);
-  const fields = { goal: $('goal'), why: $('why'), attempt: $('attempt') };
+  const fields = {
+    goal: $('goal'), why: $('why'), why1: $('why1'), why2: $('why2'), why3: $('why3'), attempt: $('attempt'),
+  };
+  const WHY_KEYS = ['why', 'why1', 'why2', 'why3'];
   const attemptLabel = $('attempt-label');
+  const themeColor = document.querySelector('meta[name="theme-color"]');
   const progressPath = $('progress');
   const progressLength = progressPath.getTotalLength();
   const scale = $('scale');
@@ -30,7 +34,7 @@
 
   const PHASES = ['setup', 'focusing', 'ringing', 'review'];
   const defaults = {
-    phase: 'setup', goal: '', why: '', attempt: '',
+    phase: 'setup', goal: '', why: '', why1: '', why2: '', why3: '', whyDepth: 0, attempt: '',
     minutes: 0, speed: 1, startedAt: 0, endAt: 0, endedAt: 0, endedEarly: false,
   };
   const state = { ...defaults, ...load() };
@@ -220,8 +224,10 @@
 
     const locked = phase === 'focusing' || phase === 'ringing';
     for (const el of Object.values(fields)) {
-      el.readOnly = locked;
-      el.tabIndex = locked ? -1 : 0;
+      // "What I will try:" stays editable during a session so it can take notes.
+      const frozen = locked && el !== fields.attempt;
+      el.readOnly = frozen;
+      el.tabIndex = frozen ? -1 : 0;
       el.closest('.field').classList.toggle('is-empty', !el.value.trim());
     }
 
@@ -229,7 +235,8 @@
     attemptLabel.textContent = reviewing ? 'What I tried:' : 'What I will try:';
     fields.attempt.placeholder = reviewing
       ? 'What you did, what worked, where you got stuck'
-      : 'Rebuild the date table and fix the YoY measure';
+      : locked ? 'Jot notes as you work' : 'Rebuild the date table and fix the YoY measure';
+    themeColor.content = locked ? '#0B141B' : '#00406B';
 
     if (phase === 'ringing') document.title = "Time's up · Focus";
     else if (phase !== 'focusing') document.title = TITLE;
@@ -250,7 +257,7 @@
     Object.assign(state, {
       minutes, speed: SPEED, startedAt: now, endAt: now + minutes * 60000 / SPEED, endedAt: 0, endedEarly: false,
     });
-    document.activeElement?.blur();
+    document.activeElement?.blur(); // close the phone keyboard
     lastLabel = '';
     updateClock();
     setPhase('focusing');
@@ -382,12 +389,21 @@
 
   // ---------- Copy for Teams ----------
 
+  // Joins separate notes (lines, or several Why boxes) into one comma-separated line for Teams.
+  function joinNotes(texts) {
+    return texts
+      .flatMap((text) => text.split('\n'))
+      .map((part) => part.trim().replace(/,+$/, ''))
+      .filter(Boolean)
+      .join(', ');
+  }
+
   function buildMessage(who) {
-    const lines = [`@${who}`];
-    const goal = fields.goal.value.trim();
-    const why = fields.why.value.trim();
-    const tried = fields.attempt.value.trim();
-    if (goal) lines.push(`Big goal: ${goal}`);
+    const goal = joinNotes([fields.goal.value]);
+    const why = joinNotes(WHY_KEYS.slice(0, state.whyDepth + 1).map((key) => fields[key].value));
+    const tried = joinNotes([fields.attempt.value]);
+    const lines = [`@${who} I need help.`];
+    if (goal) lines.push(`Goal: ${goal}`);
     if (why) lines.push(`Why: ${why}`);
     if (tried) lines.push(`What I tried: ${tried}`);
     return lines.join('\n');
@@ -422,6 +438,27 @@
     }
     ta.remove();
     return ok;
+  }
+
+  // ---------- Think Hard: dig one "Why?" deeper ----------
+
+  // Shows the extra Why boxes up to the current depth; only the deepest one offers the next button.
+  function renderWhys() {
+    WHY_KEYS.forEach((key, level) => {
+      const field = fields[key].closest('.field');
+      field.hidden = level > state.whyDepth;
+      const button = field.querySelector('.think');
+      if (button) button.hidden = level !== state.whyDepth;
+    });
+  }
+
+  function thinkDeeper(level) {
+    state.whyDepth = Math.max(state.whyDepth, level);
+    save();
+    renderWhys();
+    const next = fields[WHY_KEYS[level]];
+    autosize(next);
+    next.focus();
   }
 
   // ---------- Small UI helpers ----------
@@ -465,6 +502,11 @@
   document.querySelectorAll('.duration').forEach((button) => {
     button.addEventListener('click', () => start(Number(button.dataset.minutes)));
   });
+  document.querySelectorAll('.think').forEach((button) => {
+    button.addEventListener('click', () => thinkDeeper(Number(button.dataset.reveal)));
+  });
+  state.whyDepth = Math.min(Math.max(Number(state.whyDepth) || 0, 0), WHY_KEYS.length - 1);
+  renderWhys();
   document.querySelectorAll('.ask-button').forEach((button) => {
     button.addEventListener('click', () => copyFor(button.dataset.who));
   });
