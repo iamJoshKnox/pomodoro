@@ -295,6 +295,16 @@
 
   function enterReview() {
     statusEl.textContent = statusText();
+    // After a session, show the whys as one box holding the same comma-joined answer the timer showed.
+    const merged = allWhys();
+    fields.why.value = merged;
+    state.why = merged;
+    for (const key of WHY_KEYS.slice(1)) {
+      fields[key].value = '';
+      state[key] = '';
+    }
+    state.whyDepth = 0;
+    renderWhys();
     setPhase('review');
   }
 

@@ -506,6 +506,7 @@ textarea:focus {
 .state-review .status { display: block; }
 .state-review .durations { display: none; }
 .state-review .ask { display: flex; }
+.state-review .think { display: none; }
 
 /* ---------- Toast & helpers ---------- */
 
