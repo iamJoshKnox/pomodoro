@@ -43,6 +43,7 @@ body {
 }
 
 button,
+input,
 textarea { font: inherit; color: inherit; }
 
 button { cursor: pointer; }
@@ -332,6 +333,108 @@ textarea:focus {
 
 .ask-button:active { transform: translateY(1px); box-shadow: none; }
 
+.ask-button:only-child { grid-column: 1 / -1; }
+
+.ask-empty {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.ask-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 12px;
+}
+
+/* ---------- People dialog ---------- */
+
+.people-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgba(14, 42, 63, .3);
+}
+
+.people-dialog::backdrop { background: rgba(11, 20, 27, .45); }
+
+.people-form {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+}
+
+.people-form h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1.2rem;
+}
+
+.people-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.people-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.people-list li {
+  display: flex;
+  gap: 8px;
+}
+
+.people-list input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.people-list input:focus {
+  outline: none;
+  border-color: var(--olive);
+  box-shadow: 0 0 0 4px rgba(179, 210, 53, .35);
+}
+
+.remove-person {
+  flex: none;
+  width: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: #EEF1EA;
+  color: var(--muted);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.people-form .add-person {
+  justify-self: start;
+  padding: 0;
+}
+
+.people-done {
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
 .hint {
   margin: 0;
   color: var(--muted);
@@ -566,6 +669,7 @@ textarea:focus {
 @media (hover: hover) {
   .duration:hover { filter: brightness(1.05); transform: translateY(-1px); }
   .ask-button:hover { background: #00507F; transform: translateY(-1px); }
+  .remove-person:hover { background: #E2E7DC; color: var(--ink); }
   .think:hover { text-decoration: underline; text-underline-offset: 3px; }
   .text-button:hover { color: var(--ink); text-decoration-color: currentColor; }
 }

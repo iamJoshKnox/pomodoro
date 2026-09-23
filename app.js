@@ -425,19 +425,22 @@
     return joinNotes(WHY_KEYS.map((key) => fields[key].value));
   }
 
-  function buildMessage(who) {
+  // Ends with the @name on its own line: pasted text never becomes a Teams tag, but deleting
+  // that name's last letter makes Teams suggest the person, which tags them properly.
+  function buildMessage(name) {
     const goal = joinNotes([fields.goal.value]);
     const why = allWhys();
     const tried = joinNotes([fields.attempt.value]);
-    const lines = [`@${who} I need help.`];
+    const lines = [`${firstName(name)}, I need help.`];
     if (goal) lines.push(`Goal: ${goal}`);
     if (why) lines.push(`Why: ${why}`);
     if (tried) lines.push(`What I tried: ${tried}`);
+    lines.push(`@${name}`);
     return lines.join('\n');
   }
 
-  async function copyFor(who) {
-    const text = buildMessage(who);
+  async function copyFor(name) {
+    const text = buildMessage(name);
     let ok = false;
     try {
       await navigator.clipboard.writeText(text);
@@ -445,7 +448,91 @@
     } catch {
       ok = legacyCopy(text);
     }
-    showToast(ok ? `Copied for ${who}. Paste in Teams.` : 'Could not copy. Please try again.');
+    showToast(ok
+      ? `Copied for ${firstName(name)}. Paste it into Teams.`
+      : 'Could not copy. Please try again.');
+  }
+
+  // ---------- People to ask (kept apart from session state, so restarts never touch it) ----------
+
+  const PEOPLE_KEY = 'coop-focus-people-v1';
+  const DEFAULT_PEOPLE = ['Joel Leichty', 'Eric Frisk'];
+  const peopleDialog = $('people-dialog');
+  const peopleList = $('people-list');
+  let people = loadPeople();
+
+  function loadPeople() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PEOPLE_KEY));
+      if (Array.isArray(saved)) return cleanNames(saved);
+    } catch {
+      // Fall through to the defaults.
+    }
+    return DEFAULT_PEOPLE.slice();
+  }
+
+  function savePeople() {
+    try {
+      localStorage.setItem(PEOPLE_KEY, JSON.stringify(people));
+    } catch {
+      // Storage unavailable: the list still works until the page closes.
+    }
+  }
+
+  function cleanNames(names) {
+    return names.filter((n) => typeof n === 'string').map((n) => n.trim().replace(/^@+/, '')).filter(Boolean);
+  }
+
+  function firstName(name) {
+    return name.split(/\s+/)[0];
+  }
+
+  // Buttons use first names, unless two people share one.
+  function renderAskButtons() {
+    const firsts = people.map(firstName);
+    const buttons = people.map((name, i) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ask-button';
+      button.dataset.index = i;
+      button.textContent = `Ask ${firsts.indexOf(firsts[i]) === firsts.lastIndexOf(firsts[i]) ? firsts[i] : name}`;
+      return button;
+    });
+    $('ask-buttons').replaceChildren(...buttons);
+    $('ask-empty').hidden = people.length > 0;
+  }
+
+  function addPersonRow(name = '') {
+    const row = document.createElement('li');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = name;
+    input.placeholder = 'Name as shown in Teams';
+    input.autocomplete = 'off';
+    input.setAttribute('aria-label', 'Person name');
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'remove-person';
+    remove.textContent = '×';
+    remove.setAttribute('aria-label', name ? `Remove ${name}` : 'Remove person');
+    remove.addEventListener('click', () => row.remove());
+    row.append(input, remove);
+    peopleList.appendChild(row);
+    return input;
+  }
+
+  function openPeople() {
+    peopleList.replaceChildren();
+    people.forEach((name) => addPersonRow(name));
+    peopleDialog.showModal();
+    (peopleList.querySelector('input') || $('add-person')).focus();
+  }
+
+  // Done, Enter or Escape all keep what's in the list.
+  function closePeople() {
+    people = cleanNames([...peopleList.querySelectorAll('input')].map((input) => input.value));
+    savePeople();
+    renderAskButtons();
   }
 
   // Fallback for browsers or pages (plain http) without the async clipboard API.
@@ -495,7 +582,7 @@
     toastEl.textContent = message;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
   }
 
   function announce(message) {
@@ -537,9 +624,14 @@
   // A session in progress keeps them, since it was started with them.
   if (state.phase === 'setup') state.whyDepth = 0;
   renderWhys();
-  document.querySelectorAll('.ask-button').forEach((button) => {
-    button.addEventListener('click', () => copyFor(button.dataset.who));
+  renderAskButtons();
+  $('ask-buttons').addEventListener('click', (event) => {
+    const button = event.target.closest('.ask-button');
+    if (button) copyFor(people[Number(button.dataset.index)]);
   });
+  $('edit-people').addEventListener('click', openPeople);
+  $('add-person').addEventListener('click', () => addPersonRow().focus());
+  peopleDialog.addEventListener('close', closePeople);
   $('end-early').addEventListener('click', endEarly);
   $('restart').addEventListener('click', restart);
 

@@ -85,14 +85,25 @@
     <button type="button" class="text-button end-early" id="end-early">End early</button>
 
     <div class="ask" id="ask">
-      <div class="ask-buttons">
-        <button type="button" class="ask-button" data-who="Joel">Ask Joel</button>
-        <button type="button" class="ask-button" data-who="Eric">Ask Eric</button>
+      <div class="ask-buttons" id="ask-buttons"></div>
+      <p class="ask-empty" id="ask-empty" hidden>No one to ask yet. Add someone with Edit people.</p>
+      <p class="hint">Paste into Teams, then delete the last letter of the @name to tag them.</p>
+      <div class="ask-links">
+        <button type="button" class="text-button" id="edit-people">Edit people</button>
+        <button type="button" class="text-button restart" id="restart">Start another session</button>
       </div>
-      <p class="hint">Copies your goal, why, and what you tried, ready to paste into Teams.</p>
-      <button type="button" class="text-button restart" id="restart">Start another session</button>
     </div>
   </main>
+
+  <dialog class="people-dialog" id="people-dialog" aria-labelledby="people-title">
+    <form method="dialog" class="people-form">
+      <h2 id="people-title">People to ask</h2>
+      <p class="people-help">Use each name as it appears in Teams. The button shows the first name.</p>
+      <ul class="people-list" id="people-list"></ul>
+      <button type="button" class="text-button add-person" id="add-person">+ Add person</button>
+      <button type="submit" class="people-done">Done</button>
+    </form>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="announcer" aria-live="assertive"></div>
