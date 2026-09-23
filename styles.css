@@ -341,18 +341,18 @@ textarea:focus {
   text-align: center;
 }
 
-/* A quiet inline link at the end of the hint. */
+/* "@name" in the hint doubles as the edit-names link: part of the sentence, with only a faint dotted underline. */
 .edit-names {
-  padding: 4px 0;
+  padding: 2px 0;
   border: 0;
   background: none;
-  color: var(--muted);
+  color: inherit;
   font-size: inherit;
-  white-space: nowrap;
+  text-decoration: underline dotted rgba(92, 107, 117, .5);
   text-underline-offset: 3px;
 }
 
-.edit-names:focus-visible { text-decoration: underline; }
+.edit-names:focus-visible { text-decoration: underline solid; color: var(--ink); }
 
 /* ---------- People dialog ---------- */
 
@@ -676,7 +676,7 @@ textarea:focus {
   .duration:hover { filter: brightness(1.05); transform: translateY(-1px); }
   .ask-button:hover { background: #00507F; transform: translateY(-1px); }
   .remove-person:hover { background: #E2E7DC; color: var(--ink); }
-  .edit-names:hover { color: var(--ink); text-decoration: underline; }
+  .edit-names:hover { color: var(--ink); text-decoration: underline solid; }
   .think:hover { text-decoration: underline; text-underline-offset: 3px; }
   .text-button:hover { color: var(--ink); text-decoration-color: currentColor; }
 }
