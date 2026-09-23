@@ -15,7 +15,7 @@
   --card: #FFFFFF;
   --line: #D6DDD2;
 
-  --dial-small: clamp(120px, 34vw, 168px);
+  --dial-small: 64px;
   /* Logo size while focusing; the countdown scale reaches ~37% further out. */
   --dial-large: min(62vw, 38vh, 320px);
   --ease: cubic-bezier(.2, .8, .2, 1);
@@ -55,18 +55,44 @@ button { cursor: pointer; }
 .app {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
   max-width: 560px;
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
-  padding: max(28px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
+
+/* ---------- Masthead: compact on phones so the start buttons fit without scrolling ---------- */
+
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.masthead .dial-wrap { margin: 0; }
+.masthead .intro { text-align: left; }
+.masthead .lede { display: none; }
+
+/* Roomy screens get the big stacked logo. */
+@media (min-width: 720px) and (min-height: 820px) {
+  :root { --dial-small: 168px; }
+  .masthead { flex-direction: column; gap: 20px; }
+  .masthead .dial-wrap { margin: 0 auto; }
+  .masthead .intro { text-align: center; }
+  .masthead .lede { display: block; }
+}
+
+.state-focusing .masthead,
+.state-ringing .masthead { flex-direction: column; }
 
 /* ---------- Logo dial ---------- */
 
 .dial-wrap {
+  flex: none;
   width: var(--dial-small);
   margin: 0 auto;
   transition: width .7s var(--ease), margin .7s var(--ease);
@@ -163,8 +189,8 @@ h1 {
 
 .fields {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 14px;
+  padding: 16px;
 }
 
 .field { display: grid; gap: 6px; transition: opacity .6s var(--ease), filter .6s var(--ease); }
@@ -554,7 +580,7 @@ textarea:focus {
 
 @media (min-width: 720px) {
   .app { padding-top: 56px; gap: 24px; }
-  .fields { padding: 24px; }
+  .fields { padding: 24px; gap: 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
