@@ -18,7 +18,6 @@
   const progressPath = $('progress');
   const progressLength = progressPath.getTotalLength();
   const scale = $('scale');
-  const pointer = $('pointer');
   const statusEl = $('status');
   const toastEl = $('toast');
   const announcer = $('announcer');
@@ -154,8 +153,6 @@
     // The navy arc shrinks toward its top-right end (the 0 mark) as time runs out:
     // an empty dash, a gap for the time used, then the time left.
     const used = progressLength * (1 - v.fill);
-    // The red pointer sits on the arc's shrinking end, which is the time left on the scale.
-    pointer.setAttribute('transform', `rotate(${(ARC_START + ARC_SWEEP * (1 - v.fill)).toFixed(2)})`);
     progressPath.style.strokeDasharray = v.fill >= 0.9999
       ? 'none'
       : `0 ${used.toFixed(1)} ${(progressLength - used).toFixed(1)} ${progressLength.toFixed(1)}`;
@@ -303,6 +300,13 @@
 
   function restart() {
     statusEl.textContent = '';
+    // A new session starts from the first Why: clear and fold away the deeper ones.
+    for (const key of WHY_KEYS.slice(1)) {
+      fields[key].value = '';
+      state[key] = '';
+    }
+    state.whyDepth = 0;
+    renderWhys();
     setPhase('setup');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

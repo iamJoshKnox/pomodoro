@@ -4,7 +4,7 @@ A simple, Cooptimize-branded pomodoro timer that works on phones and desktops.
 
 1. Answer three questions: **What's the big goal?**, **Why?** and **What I will try:**
    Click the red **(Think Hard)** link next to Why to add another Why box, then **(Think Harder)** and **(UltraThink)** to dig deeper still (up to four whys). The extra boxes fold away when the page is refreshed; clicking the links again brings back what you wrote.
-2. Pick **15**, **30** or **45** minutes. The page switches to a dark night-mode focus screen showing your goal and your whys, joined into one comma-separated answer. **What I will try:** stays open, so you can jot notes as you work. Tick marks along the navy C count down from your session length to 0, and the navy arc starts full and shrinks toward the 0 mark as time runs out, with a red pointer riding its end. The other Cooptimize Cs turn like clock hands, and the red dot breathes (in for 4 seconds, out for 4).
+2. Pick **15**, **30** or **45** minutes. The page switches to a dark night-mode focus screen showing your goal and your whys, joined into one comma-separated answer. **What I will try:** stays open, so you can jot notes as you work. Tick marks along the navy C count down from your session length to 0, and the navy arc starts full and shrinks toward the red pointer at the 0 mark as time runs out. The other Cooptimize Cs turn like clock hands, and the red dot breathes (in for 4 seconds, out for 4).
 3. At 00:00 the Cs line up into the logo, which shakes like an alarm clock with a soft ding.
 4. Tidy up **What I tried:**, then press **Ask Joel** or **Ask Eric**. That copies a message ready to paste into Teams, with all the whys and all the notes each joined into one line:
 
