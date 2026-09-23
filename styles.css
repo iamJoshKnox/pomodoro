@@ -15,7 +15,7 @@
   --card: #FFFFFF;
   --line: #D6DDD2;
 
-  --dial-small: 64px;
+  --dial-small: clamp(80px, 14vh, 150px); /* scales with screen height */
   /* Logo size while focusing; the countdown scale reaches ~37% further out. */
   --dial-large: min(62vw, 38vh, 320px);
   --ease: cubic-bezier(.2, .8, .2, 1);
@@ -61,33 +61,23 @@ button { cursor: pointer; }
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
-  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
-/* ---------- Masthead: compact on phones so the start buttons fit without scrolling ---------- */
+/* ---------- Masthead: stacked logo and title, kept tight so the start buttons fit ---------- */
 
 .masthead {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  gap: 10px;
 }
 
-.masthead .dial-wrap { margin: 0; }
-.masthead .intro { text-align: left; }
-.masthead .lede { display: none; }
-
-/* Roomy screens get the big stacked logo. */
-@media (min-width: 720px) and (min-height: 820px) {
-  :root { --dial-small: 168px; }
-  .masthead { flex-direction: column; gap: 20px; }
-  .masthead .dial-wrap { margin: 0 auto; }
-  .masthead .intro { text-align: center; }
-  .masthead .lede { display: block; }
+/* On short phone screens, drop the subtitle so the start buttons stay above the fold. */
+@media (max-height: 700px) {
+  :root { --dial-small: clamp(72px, 11vh, 150px); }
+  .masthead .lede { display: none; }
 }
-
-.state-focusing .masthead,
-.state-ringing .masthead { flex-direction: column; }
 
 /* ---------- Logo dial ---------- */
 
@@ -579,7 +569,7 @@ textarea:focus {
 }
 
 @media (min-width: 720px) {
-  .app { padding-top: 56px; gap: 24px; }
+  .app { padding-top: 32px; gap: 24px; }
   .fields { padding: 24px; gap: 18px; }
 }
 
