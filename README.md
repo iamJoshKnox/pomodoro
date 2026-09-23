@@ -11,7 +11,7 @@ A simple, Cooptimize-branded pomodoro timer that works on phones and desktops.
    ```
    @Joel I need help.
    Goal: Fix Broken Power BI Report
-   Why: It is broken, users do not like when reports are broken or numbers are wrong.
+   Why: It is broken, users do not like broken reports.
    What I tried: Open report in powerbi.com app, Investigate DAX measures, Look at stored procedures populating reported facts.
    ```
 
