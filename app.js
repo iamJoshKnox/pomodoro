@@ -232,9 +232,9 @@
     }
 
     const reviewing = phase === 'review';
-    attemptLabel.textContent = reviewing ? 'What I tried:' : 'What I will try:';
+    attemptLabel.textContent = reviewing ? 'What I tried:' : locked ? 'What I am trying:' : 'What I will try:';
     // The timer screen shows every Why as one comma-separated answer.
-    const whySummary = joinNotes(WHY_KEYS.slice(0, state.whyDepth + 1).map((key) => fields[key].value));
+    const whySummary = allWhys();
     $('why-summary').textContent = whySummary;
     $('why-summary').closest('.field').classList.toggle('is-empty', !whySummary);
 
@@ -410,9 +410,14 @@
       .join(', ');
   }
 
+  // Every saved Why, including boxes folded away after a refresh, as one comma-separated answer.
+  function allWhys() {
+    return joinNotes(WHY_KEYS.map((key) => fields[key].value));
+  }
+
   function buildMessage(who) {
     const goal = joinNotes([fields.goal.value]);
-    const why = joinNotes(WHY_KEYS.slice(0, state.whyDepth + 1).map((key) => fields[key].value));
+    const why = allWhys();
     const tried = joinNotes([fields.attempt.value]);
     const lines = [`@${who} I need help.`];
     if (goal) lines.push(`Goal: ${goal}`);
