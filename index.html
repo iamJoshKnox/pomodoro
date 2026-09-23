@@ -40,23 +40,33 @@
         <textarea id="goal" rows="1" placeholder="Ship the Q3 sales dashboard"></textarea>
       </div>
       <div class="field field-why">
-        <label for="why">Why?</label>
+        <div class="field-head">
+          <label for="why">Why?</label>
+          <button type="button" class="think" data-reveal="1">(Think Hard)</button>
+        </div>
         <textarea id="why" rows="1" placeholder="Leadership needs it for Monday's review"></textarea>
-        <button type="button" class="think" data-reveal="1">Think Hard</button>
       </div>
       <div class="field field-why" id="why-level-1" hidden>
-        <label for="why1">Why?</label>
+        <div class="field-head">
+          <label for="why1">Why?</label>
+          <button type="button" class="think" data-reveal="2">(Think Harder)</button>
+        </div>
         <textarea id="why1" rows="1" placeholder="Why does that matter?"></textarea>
-        <button type="button" class="think" data-reveal="2">Think Harder</button>
       </div>
       <div class="field field-why" id="why-level-2" hidden>
-        <label for="why2">Why?</label>
+        <div class="field-head">
+          <label for="why2">Why?</label>
+          <button type="button" class="think" data-reveal="3">(UltraThink)</button>
+        </div>
         <textarea id="why2" rows="1" placeholder="And why does that matter?"></textarea>
-        <button type="button" class="think" data-reveal="3">UltraThink</button>
       </div>
       <div class="field field-why" id="why-level-3" hidden>
         <label for="why3">Why?</label>
         <textarea id="why3" rows="1" placeholder="The real reason, underneath it all"></textarea>
+      </div>
+      <div class="field field-why-summary">
+        <label>Why?</label>
+        <p class="why-summary" id="why-summary"></p>
       </div>
       <div class="field field-try">
         <label for="attempt" id="attempt-label">What I will try:</label>

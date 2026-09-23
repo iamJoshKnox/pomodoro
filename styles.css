@@ -272,23 +272,24 @@ textarea:focus {
   opacity: .8;
 }
 
-.think {
-  justify-self: start;
-  min-height: 36px;
-  margin-top: 2px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--red);
-  color: #fff;
-  font-size: .9rem;
-  font-weight: 700;
-  letter-spacing: .02em;
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .15);
-  transition: transform .15s ease, filter .15s ease;
+.field-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
-.think:active { transform: translateY(1px); box-shadow: none; }
+.think {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.field-why-summary { display: none; }
+
+.why-summary { margin: 0; }
 
 .ask { display: none; flex-direction: column; gap: 10px; }
 
@@ -395,7 +396,15 @@ textarea:focus {
 .state-focusing .end-early { display: block; }
 
 .state-focusing .think,
-.state-ringing .think { display: none; }
+.state-ringing .think,
+.state-focusing .field-why,
+.state-ringing .field-why { display: none; }
+
+.state-focusing .field-why-summary,
+.state-ringing .field-why-summary { display: grid; }
+
+.state-focusing .why-summary,
+.state-ringing .why-summary { font-size: 1.1rem; line-height: 1.4; overflow-wrap: anywhere; }
 
 .state-focusing .card,
 .state-ringing .card {
@@ -538,7 +547,7 @@ textarea:focus {
 @media (hover: hover) {
   .duration:hover { filter: brightness(1.05); transform: translateY(-1px); }
   .ask-button:hover { background: #00507F; transform: translateY(-1px); }
-  .think:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .think:hover { text-decoration: underline; text-underline-offset: 3px; }
   .text-button:hover { color: var(--ink); text-decoration-color: currentColor; }
 }
 

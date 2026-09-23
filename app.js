@@ -233,6 +233,11 @@
 
     const reviewing = phase === 'review';
     attemptLabel.textContent = reviewing ? 'What I tried:' : 'What I will try:';
+    // The timer screen shows every Why as one comma-separated answer.
+    const whySummary = joinNotes(WHY_KEYS.slice(0, state.whyDepth + 1).map((key) => fields[key].value));
+    $('why-summary').textContent = whySummary;
+    $('why-summary').closest('.field').classList.toggle('is-empty', !whySummary);
+
     fields.attempt.placeholder = reviewing
       ? 'What you did, what worked, where you got stuck'
       : locked ? 'Jot notes as you work' : 'Rebuild the date table and fix the YoY measure';
@@ -506,6 +511,9 @@
     button.addEventListener('click', () => thinkDeeper(Number(button.dataset.reveal)));
   });
   state.whyDepth = Math.min(Math.max(Number(state.whyDepth) || 0, 0), WHY_KEYS.length - 1);
+  // A fresh page starts with the extra Whys folded away (their text is kept for Think Hard to reopen).
+  // A session in progress keeps them, since it was started with them.
+  if (state.phase === 'setup') state.whyDepth = 0;
   renderWhys();
   document.querySelectorAll('.ask-button').forEach((button) => {
     button.addEventListener('click', () => copyFor(button.dataset.who));
